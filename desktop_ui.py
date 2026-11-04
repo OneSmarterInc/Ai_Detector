@@ -41,6 +41,8 @@ class InspectorApp:
         self.files_button.pack(side='left', padx=(0,12))
         self.folder_button = ttk.Button(choices, text='Choose a folder', command=self.choose_folder)
         self.folder_button.pack(side='left')
+        self.limits_button = ttk.Button(choices, text='File limits', command=self.show_limits)
+        self.limits_button.pack(side='left', padx=(12,0))
         self.status = tk.StringVar(value='Ready when you are.')
         ttk.Label(frame, textvariable=self.status, wraplength=650).pack(anchor='w', pady=(24,10))
         self.progress = ttk.Progressbar(frame, mode='indeterminate')
@@ -51,6 +53,24 @@ class InspectorApp:
         ttk.Label(frame, text='The model can be wrong. Its score is not proof of AI use.\nTechnical images stay hidden until you choose to see them.', style='Small.TLabel', wraplength=650).pack(anchor='w', pady=(16,0))
         root.protocol('WM_DELETE_WINDOW', self.close)
         self.poll_id = root.after(80, self.poll)
+
+    def show_limits(self):
+        from tkinter.scrolledtext import ScrolledText
+        try:
+            guide = (Path(__file__).resolve().parent/'FILE-LIMITS.txt').read_text(encoding='utf-8')
+        except OSError:
+            messagebox.showerror('File limits', 'The file limits guide is missing. Restore FILE-LIMITS.txt in the application folder.', parent=self.root)
+            return
+        window = tk.Toplevel(self.root)
+        window.title('File types and limits')
+        window.geometry('680x520')
+        window.minsize(520,360)
+        text = ScrolledText(window, wrap='word', font=('Segoe UI',11), padx=18, pady=16)
+        text.pack(fill='both',expand=True)
+        text.insert('1.0',guide)
+        text.configure(state='disabled')
+        window.bind('<Escape>',lambda event: window.destroy())
+        text.focus_set()
 
     def choose_files(self):
         paths = filedialog.askopenfilenames(parent=self.root, title='Choose files to check', filetypes=[('Supported files', ' '.join('*'+x for x in sorted(self.supported))), ('All files', '*.*')])

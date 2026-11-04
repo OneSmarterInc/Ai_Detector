@@ -74,3 +74,19 @@ Large model weights, installed libraries, local environments, scan reports and b
 ## Harder accuracy follow-up (4 November 2026)
 
 A separate 96-text Beemo study covered human, original AI and expert-edited AI writing from ten generators. Gradient gave 69 correct origin decisions, 15 wrong and 12 uncertain. Cutoff changes and tested model combinations did not meet the improvement criteria, so the model and scoring rules remain unchanged. Curly-apostrophe word counting and mixed-passage explanations were repaired. See [the follow-up report](docs/ACCURACY-FOLLOWUP.txt). These results are sample-specific; expert-edited AI is evaluated as AI-origin, not entirely AI-written.
+
+## File types and limits
+
+Open **File limits** in the app for the full [file limits guide](FILE-LIMITS.txt).
+
+| Type | Minimum for AI writing estimate | File and inspection limits |
+|---|---|---|
+| PDF | 100 English words; no minimum page-count rule | 100 MiB/file; inspect first 300 pages; up to 50 embedded images |
+| DOCX | 100 English words; no page-count rule | 100 MiB/file, 200 MiB expanded; up to 50 embedded images |
+| TXT, MD, HTML | 100 English words; no fixed character minimum | 100 MiB/file |
+| CSV, JSON, PY, XML, TEX, LOG | AI writing estimate disabled | 100 MiB/file; file/text checks only |
+| PNG, JPG/JPEG, WEBP, TIF/TIFF, BMP | No AI writing/image-authorship estimate | 100 MiB/file and 40 megapixels; first frame/page only |
+
+For eligible prose, only the **first 200,000 extracted characters** are considered, before cleanup, and **up to 12 sections of 480 body tokens** are scored. Longer text is sampled and the report discloses partial coverage. A 300-page PDF is not necessarily fully scored by the AI model. PDFs above 300 pages are accepted if otherwise valid and within the file-size cap, but pages after 300 are skipped.
+
+Images have no additional minimum dimensions for metadata checks. Pattern visualizations require at least 64 pixels on both sides after resizing to a maximum 1,600-pixel longest side. No OCR is included. There is no coded batch-count or combined-size cap; files are processed sequentially. The app labels its 100 MiB cap as "100 MB" (104,857,600 bytes).
