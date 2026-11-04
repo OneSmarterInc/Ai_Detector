@@ -537,10 +537,10 @@ export default function AiFileInspector({
                   </div>
                 </form>
                 <aside className={classNames("explain")}>
-                  <h2>A percentage with context.</h2>
+                  <h2>Human, AI or uncertain.</h2>
                   <p>
-                    The report shows the share of checked text in sections
-                    flagged as AI-like, human-like or uncertain.
+                    See three clear percentages: Human, AI and Uncertain.
+                    Together, they add up to 100% of the checked text.
                   </p>
                   <p>
                     It is an estimate of writing patterns—not a measurement of

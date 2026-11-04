@@ -1,5 +1,11 @@
 import Icon from "./Icon.jsx";
 import { classNames } from "../styles/classNames.js";
+
+const categories = [
+  { key: "human_like", label: "Human", color: "human" },
+  { key: "ai_like", label: "AI", color: "ai" },
+  { key: "uncertain", label: "Uncertain", color: "unknown" },
+];
 export default function FileResult({ result, jobId, api }) {
   const detection = result.text?.ai_detection;
   const share = result.breakdown;
@@ -44,41 +50,46 @@ export default function FileResult({ result, jobId, api }) {
               : "Checks finished"}
         </span>
       </header>
-      <div className={classNames("verdict")}>
-        <h3>{label}</h3>
-        <p>{explanation}</p>
-      </div>
+      {!share && (
+        <div className={classNames("verdict")}>
+          <h3>{label}</h3>
+          <p>{explanation}</p>
+        </div>
+      )}
       {share && (
         <section
           className={classNames("share")}
           aria-label="Percentage of checked text"
         >
-          <div className={classNames("share-title")}>
-            <span>
-              <strong className={classNames("percentage")}>
-                {share.ai_like}%
-              </strong>{" "}
-              <span>
-                of checked text flagged <strong>AI-like</strong>
-              </span>
-            </span>
-            <span className={classNames("estimate-tag")}>Estimate</span>
-          </div>
+          <h3 className={classNames("share-heading")}>
+            Estimated content breakdown
+          </h3>
+          <dl className={classNames("share-values")}>
+            {categories.map(({ key, label, color }) => (
+              <div key={key} className={classNames("share-value")}>
+                <dt>
+                  <i className={classNames(color)} aria-hidden="true" />
+                  {label}
+                </dt>
+                <dd className={classNames("percentage")}>{share[key]}%</dd>
+              </div>
+            ))}
+          </dl>
           <div
             className={classNames("share-bar")}
             role="img"
-            aria-label={`${share.ai_like}% AI-like, ${share.human_like}% human-like, ${share.uncertain}% uncertain`}
+            aria-label={`Estimated content: ${share.human_like}% Human, ${share.ai_like}% AI, ${share.uncertain}% Uncertain`}
           >
-            <span
-              className={classNames("ai")}
-              style={{
-                width: `${share.ai_like}%`,
-              }}
-            />
             <span
               className={classNames("human")}
               style={{
                 width: `${share.human_like}%`,
+              }}
+            />
+            <span
+              className={classNames("ai")}
+              style={{
+                width: `${share.ai_like}%`,
               }}
             />
             <span
@@ -88,24 +99,10 @@ export default function FileResult({ result, jobId, api }) {
               }}
             />
           </div>
-          <ul className={classNames("legend")}>
-            <li>
-              <i className={classNames("ai")} />
-              {share.ai_like}% AI-like
-            </li>
-            <li>
-              <i className={classNames("human")} />
-              {share.human_like}% human-like
-            </li>
-            <li>
-              <i className={classNames("unknown")} />
-              {share.uncertain}% uncertain
-            </li>
-          </ul>
           <p className={classNames("small")}>
-            Based on the length of checked sections. This is not the true
-            percentage of words written by AI. A whole section is grouped by its
-            model signal.
+            Estimates for the checked text, based on section length and writing
+            patterns. They do not prove who wrote the text. Uncertain means the
+            model could not decide.
           </p>
         </section>
       )}

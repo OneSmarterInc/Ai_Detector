@@ -18,3 +18,5 @@ This refactor does not train model weights or claim improved detection accuracy.
 Verified that all tokens in a 200,000-plus-character fixture reach inference exactly once using a recording test model, and that an actual Gradient run checks more than 12 sections. Tests cover continuous block boundaries, failure after 14 completed sections (no final percentage), page 301 extraction, nested Word text boxes/tables, headers and footnotes/endnotes. Model tokenization uses bounded text parts without truncating the document.
 
 Browser confirmation with the real model: all 14 sections of the long text fixture completed; all 301 PDF pages were attempted and the writing on the final page was scored. Live section progress was visible, with no browser JavaScript errors.
+
+Three-percentage UI: production build and 3 API-client tests passed. Browser fixtures verified Human 85% / AI 0% / Uncertain 15%, all-human, all-AI and all-uncertain states, and no percentages for unchecked content. Desktop and mobile layouts checked; no page overflow or JavaScript errors. Detection and percentage calculations are unchanged.
