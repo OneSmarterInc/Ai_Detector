@@ -18,7 +18,7 @@ if errorlevel 1 goto failed
 :dependencies
 ".venv\Scripts\python.exe" -m pip install -r requirements.txt
 if errorlevel 1 goto failed
-".venv\Scripts\python.exe" setup_model.py
+".venv\Scripts\python.exe" scripts\setup_model.py
 if errorlevel 1 goto failed
 where npm.cmd >nul 2>&1
 if errorlevel 1 (

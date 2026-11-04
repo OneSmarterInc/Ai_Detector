@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-file-inspector"
+version = "1.1.0"
+description = "Local English writing and document inspection with an optional Django API"
+requires-python = ">=3.12"
+dependencies = [
+  "Pillow>=10", "numpy>=1.24", "pypdf>=5", "python-docx>=1.1",
+  "onnxruntime==1.23.2", "tokenizers==0.22.1", "langdetect==1.0.9"
+]
+
+[project.optional-dependencies]
+web = ["Django>=5.2.19,<5.3"]
+test = ["reportlab>=4"]
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+include = ["ai_file_inspector*"]
+
+[tool.setuptools.package-data]
+"ai_file_inspector.resources" = ["*.txt"]

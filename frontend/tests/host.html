@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Host integration fixture</title>
+    <style>
+      body {
+        margin: 23px;
+        background: rgb(240, 230, 220);
+      }
+      #host-button {
+        background: rgb(120, 30, 80);
+        color: white;
+      }
+      #host-heading {
+        font-size: 19px;
+      }
+      .root {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="host-heading">Parent application</h1>
+    <button id="host-button">Parent action</button>
+    <div id="first-module"></div>
+    <div id="second-module"></div>
+    <script type="module">
+      import React from "react";
+      import { createRoot } from "react-dom/client";
+      import { AiFileInspector } from "../src/index.js";
+      const apiBaseUrl = "/api/ai-file-inspector/";
+      for (const id of ["first-module", "second-module"]) {
+        createRoot(document.getElementById(id)).render(
+          React.createElement(AiFileInspector, { apiBaseUrl }),
+        );
+      }
+    </script>
+  </body>
+</html>

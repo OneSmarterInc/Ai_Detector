@@ -1,0 +1,80 @@
+AI FILE INSPECTOR - FILE TYPES AND LIMITS
+
+OPENING A FILE IS DIFFERENT FROM CHECKING ALL ITS CONTENT
+Every input file must be at most 100 MB as labelled in the app
+(exactly 100 MiB = 104,857,600 bytes). Larger files are rejected.
+There is no minimum file size or minimum page count enforced for opening files.
+The file must still be valid and readable. Empty or short files do not get an
+AI writing estimate. The React/Django portal accepts up to 10 files and 500 MiB per batch.
+Pasted text is limited to 200,000 characters. Files are processed one at a time;
+large batches can take a long time and consume disk space for reports.
+
+AI WRITING CHECK - SAME RULES FOR PDF, DOCX AND PROSE TEXT
+Minimum: 100 words of English prose after formatting cleanup.
+There is no fixed minimum character count or page count. One page is enough
+if it supplies 100 eligible words. Other languages and code-heavy text are
+not scored by this model.
+Maximum considered: first 200,000 characters of extracted text, BEFORE cleanup.
+Maximum scored: 12 sections, up to 480 model tokens each (up to 5,760 body
+tokens). A token is a word or part of a word, not a character or a page.
+When there are more than 12 sections, the tool samples sections spread through
+the considered text. The rest is not scored. Reports disclose partial coverage.
+Therefore 200,000 characters does NOT mean every character is scored by AI.
+Hidden-character/file checks are separate and do not share this AI text cap.
+
+PDF (.pdf)
+- No minimum page count enforced. AI estimate still needs 100 eligible words.
+- Only the first 300 pages are inspected.
+- A file with more pages is not rejected for page count alone: it gets a
+  partial report. Split it into smaller PDFs to inspect the remaining pages.
+- At most 50 embedded pictures are inspected across the document.
+- Text must be extractable. Image-only scans need OCR, which is not included.
+- PDFs needing a non-empty password must be unlocked first.
+- The 100 MB/file cap and AI text limits above also apply.
+
+WORD (.docx)
+- No minimum or maximum page-count rule. The tool does not count Word pages.
+- At most 100 MB for the saved file; at most 200 MB expanded internally
+  (200 MiB = 209,715,200 bytes). Larger expanded documents are rejected.
+- The same 100-word minimum and AI text limits above apply.
+- At most 50 embedded pictures are inspected.
+- Paragraphs, tables and headers/footers are read. Text boxes, footnotes,
+  tracked changes and some nested content may be missed.
+- Old .doc files are not supported; save them as .docx.
+
+PLAIN/FORMATTED PROSE (.txt, .md, .html)
+- At most 100 MB/file; no page-count limit and no minimum character count.
+- The same 100-word minimum and AI text limits above apply.
+- UTF-8 is preferred; UTF-16/UTF-32 with a byte-order mark are supported.
+
+CODE AND DATA (.csv, .json, .py, .xml, .tex, .log)
+- At most 100 MB/file; no page-count or minimum character requirement.
+- Hidden-character and descriptive text checks only.
+- These file extensions do NOT receive an AI writing estimate.
+
+IMAGES (.png, .jpg, .jpeg, .webp, .tif, .tiff, .bmp)
+- At most 100 MB/file AND at most 40,000,000 pixels (40 megapixels).
+  For example, 8,000 x 5,000 pixels equals 40 megapixels.
+- No extra minimum width/height is enforced beyond a valid readable image.
+  Small images can still get metadata checks.
+- For pattern pictures, both dimensions must be at least 64 pixels AFTER
+  resizing. Images are reduced to at most 1,600 pixels on the longest side.
+- Multi-frame/multi-page images: only the first frame/page is inspected.
+- Images receive metadata and exploratory pattern checks, not an AI-generated
+  versus human-made verdict. Text inside images is not read (no OCR).
+- GIF, HEIC and SVG are not supported.
+
+OTHER FORMATS
+.doc, .ppt/.pptx, .xls/.xlsx, .rtf, .odt, archives, audio and video are not
+supported. Convert relevant writing to .docx, readable PDF or UTF-8 .txt.
+Unsupported files in a selected folder are skipped; selecting one directly
+produces an unsupported-file error.
+
+REPORT DISPLAY
+For hidden-character or mixed-alphabet findings, up to 100 examples of each
+are displayed; the total count is retained. This is a display limit, not an
+input limit. Technical pictures remain hidden until opened.
+
+These limits describe the current implementation, not a guarantee that every
+file below the limits is readable or that every accepted document is fully
+scored. Damaged files or extraction errors can still produce partial results.

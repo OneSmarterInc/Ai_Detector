@@ -2,7 +2,7 @@ AI File Inspector: Gradient upgrade
 3 November 2026
 
 RESULT
-Gradient is now installed in <project-folder>.
+Gradient is now installed in D:\AI-File-Inspector.
 Close an older Inspector window and start Start Inspector.bat again.
 Scan your files again to use the new model. Old reports keep their old results.
 
@@ -96,9 +96,9 @@ pixels, no script errors and no remote requests. Screenshot visually reviewed.
 
 ROLLBACK
 Old application files and restore instructions:
-<project-folder>\backups\before-gradient-20261103-211513
-Previous weights remain in <project-folder>\text-model.
-The app now uses <project-folder>\gradient-model.
+D:\AI-File-Inspector\backups\before-gradient-20261103-211513
+Previous weights remain in D:\AI-File-Inspector\text-model.
+The app now uses D:\AI-File-Inspector\gradient-model.
 
 SOURCES AND REPRODUCIBILITY
 https://huggingface.co/ShantanuT01/gradient-ai-text-detector

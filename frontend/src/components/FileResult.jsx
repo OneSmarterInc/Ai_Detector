@@ -1,0 +1,233 @@
+import Icon from "./Icon.jsx";
+import { classNames } from "../styles/classNames.js";
+export default function FileResult({ result, jobId, api }) {
+  const detection = result.text?.ai_detection;
+  const share = result.breakdown;
+  const estimated = detection?.status === "estimated";
+  const label = estimated
+    ? detection.label === "Leans AI-generated"
+      ? "Looks AI-written"
+      : detection.label === "Leans human-written"
+        ? "Looks human-written"
+        : "Not sure"
+    : "AI writing not checked";
+  const explanation = estimated
+    ? label === "Not sure"
+      ? "The model cannot give a clear answer. Some writing patterns are ambiguous or different sections disagree."
+      : label === "Looks AI-written"
+        ? "The writing resembles AI examples. This does not prove that AI wrote it."
+        : "The writing resembles human examples. The detector can still miss AI use."
+    : detection?.reason ||
+      (result.images?.length
+        ? "Pictures receive file and pattern checks. This tool does not judge whether an image was AI-generated."
+        : result.error || "No readable prose was available.");
+  const issues = result.issues || [];
+  return (
+    <article
+      className={classNames("result")}
+      aria-label={`Result for ${result.file}`}
+    >
+      <header className={classNames("result-heading")}>
+        <div className={classNames("file-title")}>
+          <Icon name="file" />
+          <h2>{result.file}</h2>
+        </div>
+        <span
+          className={classNames(
+            `status ${result.status === "complete" ? "good" : "attention"}`,
+          )}
+        >
+          {result.status === "failed"
+            ? "Could not read file"
+            : result.status === "partial"
+              ? "Partly checked"
+              : "Checks finished"}
+        </span>
+      </header>
+      <div className={classNames("verdict")}>
+        <h3>{label}</h3>
+        <p>{explanation}</p>
+      </div>
+      {share && (
+        <section
+          className={classNames("share")}
+          aria-label="Percentage of checked text"
+        >
+          <div className={classNames("share-title")}>
+            <span>
+              <strong className={classNames("percentage")}>
+                {share.ai_like}%
+              </strong>{" "}
+              <span>
+                of checked text flagged <strong>AI-like</strong>
+              </span>
+            </span>
+            <span className={classNames("estimate-tag")}>Estimate</span>
+          </div>
+          <div
+            className={classNames("share-bar")}
+            role="img"
+            aria-label={`${share.ai_like}% AI-like, ${share.human_like}% human-like, ${share.uncertain}% uncertain`}
+          >
+            <span
+              className={classNames("ai")}
+              style={{
+                width: `${share.ai_like}%`,
+              }}
+            />
+            <span
+              className={classNames("human")}
+              style={{
+                width: `${share.human_like}%`,
+              }}
+            />
+            <span
+              className={classNames("unknown")}
+              style={{
+                width: `${share.uncertain}%`,
+              }}
+            />
+          </div>
+          <ul className={classNames("legend")}>
+            <li>
+              <i className={classNames("ai")} />
+              {share.ai_like}% AI-like
+            </li>
+            <li>
+              <i className={classNames("human")} />
+              {share.human_like}% human-like
+            </li>
+            <li>
+              <i className={classNames("unknown")} />
+              {share.uncertain}% uncertain
+            </li>
+          </ul>
+          <p className={classNames("small")}>
+            Based on the length of checked sections. This is not the true
+            percentage of words written by AI. A whole section is grouped by its
+            model signal.
+          </p>
+        </section>
+      )}
+      {estimated && (
+        <div
+          className={classNames(
+            `coverage ${share?.sampled ? "attention" : ""}`,
+          )}
+        >
+          <Icon name="info" />
+          <div>
+            <strong>
+              {share?.sampled
+                ? "Only part of this document was scored."
+                : "All text prepared for this check was scored."}
+            </strong>
+            <p>
+              Checked {detection.passages_checked} of {detection.total_passages}{" "}
+              sections · {detection.words_in_checked_text?.toLocaleString()}{" "}
+              words in the considered text.
+            </p>
+            {detection.notes?.slice(1).map((note, i) => (
+              <p key={i}>{note}</p>
+            ))}
+          </div>
+        </div>
+      )}
+      {issues.length > 0 && (
+        <div className={classNames("issues")}>
+          <strong>What could not be fully checked</strong>
+          <ul>
+            {issues.map((issue, i) => (
+              <li key={i}>{issue}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {result.text && (
+        <section className={classNames("file-checks")}>
+          <h3>Other file checks</h3>
+          <dl>
+            <div>
+              <dt>Unusual characters</dt>
+              <dd>{result.text.unusual_character_count ?? 0}</dd>
+            </div>
+            <div>
+              <dt>Mixed-alphabet words</dt>
+              <dd>{result.text.mixed_alphabet_word_count ?? 0}</dd>
+            </div>
+          </dl>
+          <p className={classNames("small")}>
+            These clues can have ordinary explanations. They do not prove AI
+            use.
+          </p>
+        </section>
+      )}
+      {estimated && (
+        <details>
+          <summary>See section scores and model details</summary>
+          <p className={classNames("small")}>
+            {detection.model}. Model signal: {detection.ai_pattern_score} / 100.
+            This signal is not a probability of authorship.
+          </p>
+          <div className={classNames("table-scroll")}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Section</th>
+                  <th>AI-pattern score</th>
+                  <th>Beginning of text</th>
+                </tr>
+              </thead>
+              <tbody>
+                {detection.passages.map((p) => (
+                  <tr key={p.passage_number}>
+                    <td>{p.passage_number}</td>
+                    <td>{p.ai_pattern_score} / 100</td>
+                    <td>{p.text_excerpt}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      )}
+      {result.images?.length > 0 && (
+        <details className={classNames("image-details")}>
+          <summary>
+            See image checks · {result.images.length} image
+            {result.images.length === 1 ? "" : "s"}
+          </summary>
+          <p className={classNames("small")}>
+            These are exploratory pattern views, not evidence of an AI
+            watermark.
+          </p>
+          {result.images.map((picture, i) => (
+            <section key={i} className={classNames("image-group")}>
+              <h4>{picture.source}</h4>
+              {picture.analysis_note && <p>{picture.analysis_note}</p>}
+              {picture.frame_note && <p>{picture.frame_note}</p>}
+              <div className={classNames("pictures")}>
+                {picture.visuals.map((v, k) => (
+                  <figure key={k}>
+                    <img
+                      loading="lazy"
+                      alt={v.caption}
+                      src={api.url(
+                        `jobs/${jobId}/assets/${encodeURIComponent(v.file.split("/").pop())}`,
+                      )}
+                    />
+                    <figcaption>{v.caption}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            </section>
+          ))}
+        </details>
+      )}
+      <details>
+        <summary>See file metadata and technical details</summary>
+        <pre>{JSON.stringify(result, null, 2)}</pre>
+      </details>
+    </article>
+  );
+}

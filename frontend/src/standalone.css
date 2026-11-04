@@ -1,0 +1,4 @@
+/* Standalone demo only. Never imported by the reusable component. */
+body {
+  margin: 0;
+}
