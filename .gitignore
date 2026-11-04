@@ -13,3 +13,8 @@ gradient-model/tokenizer.json
 .env
 .env.*
 !.env.example
+web-vendor/
+web-data/
+frontend/node_modules/
+frontend/dist/
+backend-tests.txt

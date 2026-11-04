@@ -5,8 +5,9 @@ Every input file must be at most 100 MB as labelled in the app
 (exactly 100 MiB = 104,857,600 bytes). Larger files are rejected.
 There is no minimum file size or minimum page count enforced for opening files.
 The file must still be valid and readable. Empty or short files do not get an
-AI writing estimate. You can select multiple files or a folder; there is no
-coded batch-count or combined-size cap. Files are processed one at a time;
+AI writing estimate. The React/Django portal accepts up to 10 files and 500 MiB per batch.
+Pasted text is limited to 200,000 characters. The legacy CLI has no coded
+batch-count cap. Files are processed one at a time;
 large batches can take a long time and consume disk space for reports.
 
 AI WRITING CHECK - SAME RULES FOR PDF, DOCX AND PROSE TEXT

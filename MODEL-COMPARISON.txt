@@ -1,0 +1,117 @@
+AI File Inspector: Gradient upgrade
+3 November 2026
+
+RESULT
+Gradient is now installed in D:\AI-File-Inspector.
+Close an older Inspector window and start Start Inspector.bat again.
+Scan your files again to use the new model. Old reports keep their old results.
+
+Across 138 distinct comparison texts (69 human and 69 AI):
+                         Correct    Wrong    Not sure
+Previous RoBERTa model     112        17         9
+Gradient Q4                128         2         8
+
+Human text wrongly flagged as AI: 6 before, 1 with Gradient.
+AI text wrongly called human: 11 before, 1 with Gradient.
+These counts describe this test only. They are NOT a general accuracy promise.
+
+WHAT WE COMPARED
+1. Existing reference: 80 HC3 answers in five subjects.
+   Previous: 64 correct, 9 wrong, 7 unsure.
+   Gradient: 76 correct, 0 wrong, 4 unsure.
+   ModernBERT INT8: 49 correct, 21 wrong, 10 unsure.
+
+2. Additional styles: 24 texts, half human and half fresh AI.
+   Fiction, science, memoir, instructions, political and reflective essays.
+   Previous: 19 correct, 5 wrong, 0 unsure.
+   Gradient: 18 correct, 2 wrong, 4 unsure.
+   ModernBERT INT8: 9 correct, 10 wrong, 5 unsure.
+   Gradient gave fewer wrong answers, but more Not sure answers on this set.
+   It still wrongly flagged one human story and missed one AI story.
+
+3. Separate confirmation batch: 34 HC3 answers, not used for model selection.
+   Previous: 29 correct, 3 wrong, 2 unsure.
+   Gradient: 34 correct, 0 wrong, 0 unsure.
+   No cutoffs were adjusted using these results.
+
+4. Extra stress check: 12 lightly edited versions of the fresh AI examples.
+   Previous: 9 correct, 2 wrong, 1 unsure.
+   Gradient: 8 correct, 1 wrong, 3 unsure.
+   These edits were automatic contractions, word replacements and paragraph
+   removal. They were NOT real human edits. These related examples are excluded
+   from the 138-text total. Heavy rewriting remains untested.
+
+WHY GRADIENT WAS SELECTED
+ModernBERT produced substantially more human false alarms, so it was rejected.
+Gradient reduced wrong answers in both selection sets and the separate batch.
+Its larger uncertainty on creative writing is explicitly retained and reported.
+The initial selection rule asked for no loss of correct answers in either set.
+After selection results, this was revised to favour fewer wrong answers even
+when uncertainty rises. That amendment was recorded BEFORE confirmation-batch
+inference. It was not a fully preregistered experiment. Thresholds were unchanged.
+
+TEST LIMITS
+Small convenience samples, not a random or representative survey of writing.
+HC3 contains older ChatGPT responses; overlap with detector training is possible.
+Historical human text may also have been seen during model training.
+Fresh AI examples came from one assistant, not multiple independent generators.
+Human examples span older books, not modern emails or student assignments.
+The separate batch was held out from our selection, not proven absent from the
+model's training data. No claim of statistical significance is made.
+The tool still supports English prose only, with at least 100 words.
+It estimates writing patterns; it cannot prove who wrote a document.
+
+MODEL AND RUNTIME
+Original: ShantanuT01/gradient-ai-text-detector, DeBERTa-v3-large.
+Upstream revision: c2e8b6df87f8a211cbffb713fa9873a0c3a9713f.
+Conversion: batmac/gradient-ai-text-detector-onnx, Q4, 408,012,176-byte weights.
+Conversion revision: 776d0164ba0de631036c70f6a146d68a7cd4ea4e.
+Weight SHA-256: cba9f4d084a15206b0fe91aa74b6af818e503403b1df08893f88316c1a693455.
+Local ONNX Runtime CPU inference; no account, API key or document upload.
+The exact compressed version was evaluated, not just its publisher's claims.
+It is larger and slower than the previous model, especially on the first file.
+Both source cards and license metadata are kept with the model.
+
+IMPLEMENTATION
+Gradient uses its own tokenizer and [CLS]/[SEP] tokens (IDs 1 and 2).
+Its one output logit is passed through a stable sigmoid. A single-output
+softmax would incorrectly return 100% for every input, and is not used.
+Weight, tokenizer and config hashes are verified before loading.
+Balanced windows of up to 480 body tokens use the same existing 20/80 decision
+cutoffs, token-weighted mean and passage-disagreement rule. No tuning occurred.
+Scores remain model signals, not authorship probabilities or AI-word percentages.
+Hidden-character checks stay separate. Original files and old reports unchanged.
+
+VERIFICATION
+68 automated tests passed, including local/offline inference, stable scores,
+sigmoid extremes, invalid outputs, model-integrity failures, language/length
+checks, readable Word/PDF extraction, scanner limits and desktop controls.
+After installation, the actual D-drive app scanned seven files through its
+native desktop worker: TXT, DOCX, PDF, human text, short text, an image and a
+deliberately damaged PDF. Scores matched the evaluated candidate. The damaged
+PDF correctly failed; short text was not scored. Original hashes were unchanged.
+Headless Edge checks passed: simple result labels, scores/images closed by
+default, keyboard/mouse toggles, images loading, layouts at 1280/640/390/320
+pixels, no script errors and no remote requests. Screenshot visually reviewed.
+
+ROLLBACK
+Old application files and restore instructions:
+D:\AI-File-Inspector\backups\before-gradient-20261103-211513
+Previous weights remain in D:\AI-File-Inspector\text-model.
+The app now uses D:\AI-File-Inspector\gradient-model.
+
+SOURCES AND REPRODUCIBILITY
+https://huggingface.co/ShantanuT01/gradient-ai-text-detector
+https://huggingface.co/batmac/gradient-ai-text-detector-onnx
+https://huggingface.co/GeorgeDrayson/modernbert-ai-detection-raid-mage
+https://huggingface.co/onnx-community/modernbert-ai-detection-raid-mage-ONNX
+https://huggingface.co/datasets/Hello-SimpleAI/HC3 (CC-BY-SA-4.0)
+Human book sources: Project Gutenberg IDs 11, 2009, 148, 13923, 1404 and 205.
+Two fixed excerpts per book at body-word offsets 4000 and 8000, up to 260 words,
+trimmed to sentence boundaries. Excerpts were not selected using model scores.
+Confirmation data: first eligible pairs in HC3 rows 40-139, four per subject
+except open_qa, which had only one eligible pair (34 texts total).
+Workspace work/model-comparison retains scripts, source revisions, input data,
+protocol and raw results. comparison-results.json contains results without
+passage excerpts. The earlier 80-example selection is documented in the
+accuracy-checker README. All 138 exact texts were checked for duplication.

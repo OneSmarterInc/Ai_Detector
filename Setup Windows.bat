@@ -10,7 +10,7 @@ if not errorlevel 1 (
 )
 python -c "import sys,struct; assert sys.version_info[:2] == (3,12) and struct.calcsize('P') == 8" >nul 2>&1
 if errorlevel 1 (
-  echo Install 64-bit Python 3.12 with Tcl/Tk, then run this setup again.
+  echo Install 64-bit Python 3.12, then run this setup again.
   goto failed
 )
 python -m venv .venv
@@ -20,7 +20,24 @@ if errorlevel 1 goto failed
 if errorlevel 1 goto failed
 ".venv\Scripts\python.exe" setup_model.py
 if errorlevel 1 goto failed
-echo Setup complete. Open Start Inspector.bat.
+where npm.cmd >nul 2>&1
+if errorlevel 1 (
+  echo Install Node.js 22.12 or newer, then run setup again.
+  goto failed
+)
+pushd frontend
+call npm.cmd ci
+if errorlevel 1 (
+  popd
+  goto failed
+)
+call npm.cmd run build
+if errorlevel 1 (
+  popd
+  goto failed
+)
+popd
+echo Setup complete. Open Start Portal.bat.
 pause
 exit /b 0
 :failed

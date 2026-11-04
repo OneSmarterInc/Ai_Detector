@@ -1,92 +1,43 @@
-# AI File Inspector
+# AI File Inspector — React + Django
 
-A local Windows desktop tool that checks English writing with **Gradient AI Text Detector (DeBERTa-v3-large, Q4)** and creates a report in simple English. It also inspects hidden characters, file metadata and image patterns.
+A local browser portal for checking English writing, hidden characters, file metadata and image patterns. The interface is React; Django handles uploads, background checks, session access and reports. SQLite stores scan history. Gradient (DeBERTa-v3-large, Q4 ONNX) runs locally on the CPU.
 
 ## Start on Windows
 
-1. Install **64-bit Python 3.12** with Tcl/Tk support.
-2. Clone or download and extract this repository into a writable folder.
-3. Run **Setup Windows.bat** once. Internet access is needed to install libraries and download the pinned model (about 417 MB including its tokenizer).
-4. Run **Start Inspector.bat** and select your files.
+1. Install 64-bit Python 3.12 and Node.js 22.12 or newer.
+2. Download this repository into a writable folder.
+3. Run **Setup Windows.bat**. This installs Python libraries, downloads the pinned model, and builds React with `npm ci` and `npm run build`.
+4. Run **Start Portal.bat** (Start Inspector.bat opens the same portal).
+5. Open http://127.0.0.1:8000 if the browser does not open automatically. Keep the server window open.
 
-Scans run locally without an API key or document upload. The first scan may take longer while the model loads. Reports are saved in `reports/` and open in your browser.
+Scans do not send documents to an external service. Uploads are copies stored under `web-data/jobs`; originals are unchanged. Reports belong to the browser session that created them. Clearing cookies loses access to that history. Delete a scan from the portal to remove its saved copies and report. Old desktop reports remain in `reports/` and are not imported.
 
-The separately shared Windows ZIP already includes the model and libraries. Follow its `START-HERE.txt` instead of these source-installation steps. Neither distribution includes Python itself.
+This launcher serves one local computer using Django's development server, one background scanning worker and SQLite. It is not a public production deployment. A shared hosted service needs authentication, a production server, a durable job queue and deployment-specific limits.
 
-## What it checks
+## Reading the percentage
 
-- AI writing estimates for text, readable PDF and Word `.docx` files.
-- At least **100 words of English prose** are required. Code and other languages are not supported by this detector.
-- Clear labels: **Looks AI-written**, **Looks human-written**, **Not sure**, or **Not checked**.
-- Hidden Unicode characters and metadata are reported separately from the writing estimate.
-- Images, technical details and raw scores stay hidden until opened.
-- Original files are not modified. Scanned image-only PDFs need OCR, which is not included.
+The percentage means **the share of checked text in sections flagged AI-like**. Sections are weighted by token length. Scores at least 80/100 are AI-like, scores at most 20/100 are human-like, and the middle is uncertain. Rounded shares add to 100%.
 
-The result is an estimate, not proof of authorship. A score is neither a percentage of AI-written words nor a calibrated probability. Creative writing, unfamiliar writing and heavily edited text can cause mistakes. Image checks do not classify images as AI-generated or detect SynthID.
+Example: equal-length sections with two AI-like, one human-like and one uncertain produce **50% AI-like, 25% human-like, 25% uncertain**. This does not establish that half the words were actually written by AI. A short one-section document can show 100% AI-like without 100% certainty. Unchecked content has no percentage. Sampling and extraction limits are displayed separately.
 
-## Model and evaluation
+## Model and accuracy
 
-Source: [ShantanuT01/gradient-ai-text-detector](https://huggingface.co/ShantanuT01/gradient-ai-text-detector).
-Q4 conversion: [batmac/gradient-ai-text-detector-onnx](https://huggingface.co/batmac/gradient-ai-text-detector-onnx).
+- Original model: https://huggingface.co/ShantanuT01/gradient-ai-text-detector
+- Q4 conversion: https://huggingface.co/batmac/gradient-ai-text-detector-onnx
+- Conversion revision: `776d0164ba0de631036c70f6a146d68a7cd4ea4e`.
+- Runtime verifies model, tokenizer and configuration SHA-256 hashes. No remote model code is executed.
+- The model emits a single AI logit, converted using sigmoid. Scores are uncalibrated writing-pattern signals, not probabilities of authorship.
 
-The exact conversion is pinned to `776d0164ba0de631036c70f6a146d68a7cd4ea4e`. Downloads and runtime files are verified with SHA-256. Source cards, configuration and provenance are in `gradient-model/`. The model emits one AI logit; the app applies sigmoid, then combines passage scores using the documented uncertainty rules.
+**This interface update does not retrain model weights or demonstrate improved detection accuracy.** The earlier 138-example comparison gave Gradient 128 correct, 2 wrong, 8 uncertain. A harder 96-example check gave 69 correct, 15 wrong, 12 uncertain, including human false alarms. These small datasets are not an overall accuracy guarantee. See MODEL-COMPARISON.txt and ACCURACY-FOLLOWUP.txt.
 
-Across 138 limited comparison examples, the old model gave 112 correct, 17 wrong and 9 uncertain results; Gradient gave 128 correct, 2 wrong and 8 uncertain results. These are **sample-specific results, not an overall accuracy guarantee**. Dataset/training overlap is possible. Fresh AI examples came from one assistant. See [comparison details](docs/MODEL-COMPARISON.txt) for selection, separate confirmation results and limitations.
+Weights can be improved through fine-tuning. We need correctly labelled, permitted human, AI and edited examples across the writing types users actually upload. Split by source/prompt into training, development and untouched testing data. Tune the original trainable checkpoint, not the deployed Q4 ONNX file. Measure human false alarms, AI misses, uncertainty and results by writing type. Export and quantize a candidate, then retest that exact artifact against the existing model on the same unseen examples before replacing it. No such training has been performed in this update.
 
-The app passed 70 automated tests, an installed desktop scan and browser-report checks. The historical comparison document mentions backup paths from the original installation; those backups are not part of this repository.
+## File limits
 
-## Developer setup
+See **FILE-LIMITS.txt**, also available inside the portal. Web batches accept up to 10 files, 100 MiB per file and 500 MiB total. Pasted text is capped at 200,000 characters. Writing estimates require at least 100 English prose words. PDF scanning considers the first 300 pages; DOCX has no fixed page-count cap. AI scoring considers at most 200,000 characters and 12 sections of up to 480 tokens. Images get pattern/file checks, not AI-image classification. No OCR is included.
 
-```powershell
-py -3.12 -m venv .venv
-.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-.venv\Scripts\python.exe setup_model.py
-.venv\Scripts\python.exe -B run_inspector.py --check
-.venv\Scripts\python.exe -B -m unittest discover -p "test_*.py"
-```
+## Development and tests
 
-Tests use real local model inference and Tk, so run them on a Windows desktop session after downloading the model.
+`python manage.py test portal` runs the web/API tests. `python -m unittest test_detector test_inspector` runs detector and file-processing tests. Model fixtures require the downloaded model and dependencies. Run `npm run build` inside frontend for the production interface. For frontend development use `npm run dev` with Django on port 8000.
 
-Command-line scanning:
-
-```powershell
-.venv\Scripts\python.exe -B run_inspector.py sample.txt --output reports\sample
-```
-
-The output folder must not already exist. To check known-origin examples, see `accuracy-checker/`. Its JSONL labels must be known `human` or `ai` origins; do not use guessed labels from another detector.
-
-## Project files
-
-| File | Purpose |
-|---|---|
-| `inspector.py` | File extraction and inspection |
-| `ai_detector.py` | Local Gradient inference and score rules |
-| `desktop_ui.py` | Native file picker and background scanning |
-| `report_view.py` | Offline HTML report |
-| `setup_model.py` | Pinned, hash-verified model download |
-| `run_inspector.py` | Portable project launcher |
-| `test_*.py` | Application tests |
-| `examples/` | Known-origin demonstration texts |
-| `accuracy-checker/` | Evaluation tool and recorded results |
-
-Large model weights, installed libraries, local environments, scan reports and backups are excluded from Git. The model provider declares MIT licensing; its original source cards are retained. Third-party model and library terms continue to apply. No additional license for the project's own source is asserted here.
-
-## Harder accuracy follow-up (4 November 2026)
-
-A separate 96-text Beemo study covered human, original AI and expert-edited AI writing from ten generators. Gradient gave 69 correct origin decisions, 15 wrong and 12 uncertain. Cutoff changes and tested model combinations did not meet the improvement criteria, so the model and scoring rules remain unchanged. Curly-apostrophe word counting and mixed-passage explanations were repaired. See [the follow-up report](docs/ACCURACY-FOLLOWUP.txt). These results are sample-specific; expert-edited AI is evaluated as AI-origin, not entirely AI-written.
-
-## File types and limits
-
-Open **File limits** in the app for the full [file limits guide](FILE-LIMITS.txt).
-
-| Type | Minimum for AI writing estimate | File and inspection limits |
-|---|---|---|
-| PDF | 100 English words; no minimum page-count rule | 100 MiB/file; inspect first 300 pages; up to 50 embedded images |
-| DOCX | 100 English words; no page-count rule | 100 MiB/file, 200 MiB expanded; up to 50 embedded images |
-| TXT, MD, HTML | 100 English words; no fixed character minimum | 100 MiB/file |
-| CSV, JSON, PY, XML, TEX, LOG | AI writing estimate disabled | 100 MiB/file; file/text checks only |
-| PNG, JPG/JPEG, WEBP, TIF/TIFF, BMP | No AI writing/image-authorship estimate | 100 MiB/file and 40 megapixels; first frame/page only |
-
-For eligible prose, only the **first 200,000 extracted characters** are considered, before cleanup, and **up to 12 sections of 480 body tokens** are scored. Longer text is sampled and the report discloses partial coverage. A 300-page PDF is not necessarily fully scored by the AI model. PDFs above 300 pages are accepted if otherwise valid and within the file-size cap, but pages after 300 are skipped.
-
-Images have no additional minimum dimensions for metadata checks. Pattern visualizations require at least 64 pixels on both sides after resizing to a maximum 1,600-pixel longest side. No OCR is included. There is no coded batch-count or combined-size cap; files are processed sequentially. The app labels its 100 MiB cap as "100 MB" (104,857,600 bytes).
+Main files: `frontend/src/App.jsx`, `portal/views.py`, `portal/worker.py`, `portal/analysis.py`, `ai_detector.py`, `inspector.py`. The old Tkinter UI and HTML report code are retained for compatibility only; the default launcher now uses React and Django. Model weights, dependencies, uploaded documents, secrets and generated reports are excluded from Git.

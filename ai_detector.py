@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parent
 VENDOR = ROOT/'vendor'
 if VENDOR.is_dir() and str(VENDOR) not in sys.path:
     sys.path.insert(0,str(VENDOR))
-MODEL_DIR = ROOT/'gradient-model'
+MODEL_DIR = Path(os.environ.get('INSPECTOR_MODEL_DIR',str(ROOT/'gradient-model')))
 MODEL_NAME = 'Gradient AI Text Detector (DeBERTa-v3-large, Q4)'
 MODEL_SHA = 'cba9f4d084a15206b0fe91aa74b6af818e503403b1df08893f88316c1a693455'
 MODEL_REVISION = '776d0164ba0de631036c70f6a146d68a7cd4ea4e'
@@ -168,6 +168,7 @@ def analyze(text, enabled=True):
                 score = score_logit(logits)
                 first,last = encoded.offsets[start][0],encoded.offsets[end-1][1]
                 passages.append({'passage_number':index+1,'ai_pattern_score':round(score*100,1),
+                                 'signal_band':'ai_like' if score>=.8 else 'human_like' if score<=.2 else 'uncertain',
                                  'text_excerpt':cleaned[first:min(last,first+240)],'start_character':first+1,'end_character':last,
                                  'tokens':end-start})
                 scores.append(score)

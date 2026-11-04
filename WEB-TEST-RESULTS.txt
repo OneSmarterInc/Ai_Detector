@@ -1,0 +1,27 @@
+REACT / DJANGO MIGRATION VALIDATION - 4 NOVEMBER 2026
+
+React production build: passed (Vite).
+Django API tests: 18 passed.
+Existing detector/scanner regression tests: 70 passed.
+
+Real Edge browser integration:
+- TXT, PDF and DOCX AI fixtures scored; human fixture scored.
+- AI-like, human-like and uncertain shares add to 100.
+- Short text has no misleading percentage.
+- Image checks have no AI-image verdict; preview images stay collapsed.
+- Expanded image assets load correctly.
+- Corrupt PDF produces a readable error; other files finish.
+- Separate browser session cannot open another session's report.
+- Pasted short text, navigation and file-limit guide work.
+- Desktop 1360px and mobile 360px checked; no horizontal page overflow.
+- Mobile Recent scans reopens saved reports after New scan and page reload.
+- No uncaught browser JavaScript errors.
+
+API tests additionally exercise CSRF protection, upload limits, unsupported
+formats, stream limit handling, deletion rules, report download and restart recovery.
+Percentage tests cover uncertain signals, length weighting, sum-to-100 rounding,
+and raw-score boundaries that must not change because displayed scores round.
+
+These are functional tests, not a new accuracy benchmark. No model weights
+were trained or changed in this migration. See ACCURACY-FOLLOWUP.txt for the
+previous model evaluation and its false-positive/false-negative limitations.
