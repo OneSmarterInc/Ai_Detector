@@ -1,0 +1,79 @@
+AI File Inspector: harder accuracy check, 4 November 2026
+
+OUTCOME
+No tested scoring change demonstrated the required improvement. Gradient Q4
+and the current 20/80 cutoffs are retained. Do not claim a new model accuracy
+gain from this work. Two text-encoding bugs were fixed separately.
+
+WHAT WAS TESTED
+96 Beemo texts: 32 human originals, 32 original AI outputs and 32 AI outputs
+edited by human experts. Four categories: generation, open questions, rewriting
+and summarization. All ten source AI generators are represented.
+Half was used for development. The other half used different prompt IDs and
+was not inspected to choose cutoffs or combinations.
+
+Current Gradient results across the 96 texts:
+Origin                         Correct   Wrong   Not sure   Total
+Human                            20        7        5        32
+Original AI                      28        2        2        32
+Expert-edited AI                  21        6        5        32
+Total                            69       15       12        96
+
+Development set: 36 correct, 6 wrong, 6 unsure (48 texts).
+Separate confirmation: 33 correct, 9 wrong, 6 unsure (48 texts).
+Expert-edited AI was evaluated as AI-origin, not entirely AI-written. Its human
+style can be legitimate. The detector cannot establish whether AI was ever
+involved in producing a text.
+
+TRIED AND REJECTED
+1. Retaining paragraph/line breaks: all 96 examples produced exactly the same
+   token IDs after the model's tokenizer normalized whitespace. No benefit.
+2. 25 cutoff combinations for each cleanup method, chosen on development only:
+   none reduced wrong decisions while retaining correct decisions and avoiding
+   extra human false alarms. No changes were tuned on confirmation results.
+3. Five weighted combinations with the previous RoBERTa model, on development
+   only: some reduced wrong answers, but produced substantially more uncertainty
+   and fewer correct answers. None met the acceptance rules. No ensemble shipped.
+   This additional hypothesis was tested after the cutoff experiment failed,
+   but before confirmation scores were inspected.
+
+FIXES
+A character-encoding error split curly-apostrophe words such as "we're" (with
+a curly apostrophe) into two words. That could allow fewer than 100 real words
+to be scored. The word count now treats these contractions as one word.
+The same encoding problem prevented a passage-disagreement result from matching
+its specific plain-English report explanation. That match is restored.
+The desktop progress ellipsis was also repaired.
+These are correctness fixes, not evidence of better authorship classification.
+All 70 application tests passed, including the two new regression tests,
+offline model inference, file extraction and native desktop behavior.
+
+LIMITS
+This harder sample is small and intentionally selects texts between 110 and
+550 regex word tokens. It is not representative of all writing or current AI.
+Scores are signals, not probabilities of authorship. The model authors report
+evaluating Beemo; absence from training has not been independently verified.
+The earlier 138-example comparison remains a separate sample-specific result.
+Do not combine the two studies into a universal accuracy rating.
+
+REPRODUCIBILITY
+Dataset: https://huggingface.co/datasets/toloka/beemo
+Revision: 9c014107fe9b85c4c784c1ce3a43b0b7b0a6d162.
+Paper: https://arxiv.org/abs/2411.04032
+Deterministic prompt selection uses SHA-256 ordering of 'accuracy-v5:'+prompt_id.
+For each available category, first four eligible prompts form development and
+next four confirmation. One source-model row per prompt is selected by SHA-256
+of row ID. All three origins remain together; all exact texts were distinct.
+Closed QA had no eligible triples and is absent. Full source texts stay in the
+local evaluation workspace and are not included in shared reports or training.
+Source licensing differs by field; see the dataset card. No training was done.
+Workspace: work/accuracy-v5 contains the protocol, source hash, sampling and
+evaluation scripts, scores, selection records and regression-test results.
+
+NEXT SUBSTANTIAL ACCURACY WORK
+Evaluate or train a model on a much larger, correctly labelled collection that
+includes modern AI generators, real human edits, ordinary human writing and
+non-native English. Keep whole prompt/source families out of training for final
+testing. A successful upgrade must reduce mistakes without hiding the cost in
+Not sure results. More models or stricter score cutoffs alone are not evidence
+of better accuracy.

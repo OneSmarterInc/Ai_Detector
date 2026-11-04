@@ -33,7 +33,7 @@ The exact conversion is pinned to `776d0164ba0de631036c70f6a146d68a7cd4ea4e`. Do
 
 Across 138 limited comparison examples, the old model gave 112 correct, 17 wrong and 9 uncertain results; Gradient gave 128 correct, 2 wrong and 8 uncertain results. These are **sample-specific results, not an overall accuracy guarantee**. Dataset/training overlap is possible. Fresh AI examples came from one assistant. See [comparison details](docs/MODEL-COMPARISON.txt) for selection, separate confirmation results and limitations.
 
-The app passed 68 automated tests, an installed desktop scan and browser-report checks. The historical comparison document mentions backup paths from the original installation; those backups are not part of this repository.
+The app passed 70 automated tests, an installed desktop scan and browser-report checks. The historical comparison document mentions backup paths from the original installation; those backups are not part of this repository.
 
 ## Developer setup
 
@@ -70,3 +70,7 @@ The output folder must not already exist. To check known-origin examples, see `a
 | `accuracy-checker/` | Evaluation tool and recorded results |
 
 Large model weights, installed libraries, local environments, scan reports and backups are excluded from Git. The model provider declares MIT licensing; its original source cards are retained. Third-party model and library terms continue to apply. No additional license for the project's own source is asserted here.
+
+## Harder accuracy follow-up (4 November 2026)
+
+A separate 96-text Beemo study covered human, original AI and expert-edited AI writing from ten generators. Gradient gave 69 correct origin decisions, 15 wrong and 12 uncertain. Cutoff changes and tested model combinations did not meet the improvement criteria, so the model and scoring rules remain unchanged. Curly-apostrophe word counting and mixed-passage explanations were repaired. See [the follow-up report](docs/ACCURACY-FOLLOWUP.txt). These results are sample-specific; expert-edited AI is evaluated as AI-origin, not entirely AI-written.

@@ -68,7 +68,7 @@ class InspectorApp:
         self.busy = True
         self.files_button.state(['disabled'])
         self.folder_button.state(['disabled'])
-        self.status.set('Finding files to checkâ€¦')
+        self.status.set('Finding files to check…')
         self.progress.start(12)
         events, collect, scan, reports = self.events, self.collect, self.scan, self.reports
         def worker():

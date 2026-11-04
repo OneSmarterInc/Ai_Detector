@@ -107,7 +107,7 @@ def summarize(scores,weights):
     average = sum(s*w for s,w in zip(scores,weights))/sum(weights)
     disagrees = min(scores) <= .2 and max(scores) >= .8
     if disagrees:
-        label = 'Uncertain â€” passages give different signals'
+        label = 'Uncertain — passages give different signals'
     elif average >= .8:
         label = 'Leans AI-generated'
     elif average <= .2:
@@ -143,7 +143,7 @@ def analyze(text, enabled=True):
     if lines and code_lines/len(lines) > .2:
         return skip('Much of this file looks like code. This detector is intended for ordinary English paragraphs.')
     cleaned = clean_prose(text[:MAX_CHARS])
-    words = re.findall(r"\b[^\W\d_]+(?:['â€™][^\W\d_]+)?\b",cleaned)
+    words = re.findall(r"\b[^\W\d_]+(?:['’][^\W\d_]+)?\b",cleaned)
     base['words_in_checked_text'] = len(words)
     if len(words) < MIN_WORDS:
         return skip(f'Only {len(words)} words were available. Use at least {MIN_WORDS} words of English prose for an estimate.')
