@@ -74,4 +74,4 @@ Queue admission is a local best-effort limit, not a distributed quota. Multiple 
 - Standalone only: `AI_FILE_INSPECTOR_DATA_DIR`, `--port`, `--no-browser`.
 - Frontend development only: `AI_FILE_INSPECTOR_DEV_API` controls the Vite proxy target.
 
-No model weights, thresholds, file parsing rules or claims of detection accuracy changed in this restructuring. AI-like percentages describe classified sections, not measured authorship. See the accuracy and file-limit documentation before relying on results.
+Model weights and thresholds are unchanged. All sections of extracted eligible text are now scored; the former document-character, section-count and PDF-page cutoffs are removed. The optional progress callback on analyze/inspect_file reports ongoing work. AI-like percentages describe classified sections, not measured authorship. See the accuracy and file-limit documentation before relying on results.

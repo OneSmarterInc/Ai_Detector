@@ -120,7 +120,7 @@ export default function FileResult({ result, jobId, api }) {
             <strong>
               {share?.sampled
                 ? "Only part of this document was scored."
-                : "All text prepared for this check was scored."}
+                : "All extracted eligible text was scored."}
             </strong>
             <p>
               Checked {detection.passages_checked} of {detection.total_passages}{" "}
@@ -132,6 +132,13 @@ export default function FileResult({ result, jobId, api }) {
             ))}
           </div>
         </div>
+      )}
+      {result.pages_attempted != null && (
+        <p className={classNames("small")}>
+          PDF: attempted all {result.pages_attempted} of {result.page_count}{" "}
+          pages. Readable text was found on {result.pages_with_readable_text}{" "}
+          pages. Blank pages and pages needing OCR do not add readable text.
+        </p>
       )}
       {issues.length > 0 && (
         <div className={classNames("issues")}>

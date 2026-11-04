@@ -549,8 +549,8 @@ export default function AiFileInspector({
                   <div className={classNames("explain-rule")} />
                   <h3>Know what was checked</h3>
                   <p>
-                    Long documents may be sampled. You will see the coverage
-                    next to your result.
+                    Every section of extracted eligible text is checked. You
+                    will see the coverage next to your result.
                   </p>
                   <h3>Pictures work differently</h3>
                   <p>

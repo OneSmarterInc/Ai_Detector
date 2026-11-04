@@ -1,4 +1,5 @@
 import logging
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 from django.db import close_old_connections
@@ -29,6 +30,20 @@ def run_job(job_id):
         results = []
         counter = [0]
         for i, item in enumerate(job.files, 1):
+            last_progress = 0.0
+
+            def report_progress(message):
+                nonlocal last_progress
+                now = time.monotonic()
+                if now - last_progress >= 0.5:
+                    update(
+                        job_id,
+                        progress=f"File {i}/{len(job.files)}: {item['name'][:80]} - {message}"[
+                            :300
+                        ],
+                    )
+                    last_progress = now
+
             update(
                 job_id,
                 status="running",
@@ -36,7 +51,10 @@ def run_job(job_id):
             )
             try:
                 result = inspector.inspect_file(
-                    folder / "uploads" / item["stored"], assets, counter
+                    folder / "uploads" / item["stored"],
+                    assets,
+                    counter,
+                    progress=report_progress,
                 )
                 result["file"] = item["name"]
                 for picture in result.get("images", []):

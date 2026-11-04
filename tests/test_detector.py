@@ -57,11 +57,12 @@ class DetectorTests(unittest.TestCase):
     def test_chunk_limits_and_coverage(self):
         for total in (1, 480, 481, 512, 961, 10000, 100000):
             spans, count = ai.choose_ranges(total)
-            self.assertLessEqual(len(spans), 12)
+            self.assertEqual(len(spans), count)
+            self.assertEqual(sum(end - start for _, start, end in spans), total)
             self.assertEqual(spans[0][1], 0)
             self.assertEqual(spans[-1][2], total)
             self.assertTrue(all(end - start <= 480 for _, start, end in spans))
-            self.assertTrue(all(a[2] <= b[1] for a, b in zip(spans, spans[1:])))
+            self.assertTrue(all(a[2] == b[1] for a, b in zip(spans, spans[1:])))
 
     def test_score_rules(self):
         for score, label in (
@@ -154,13 +155,18 @@ class DetectorTests(unittest.TestCase):
         self.assertEqual(result["status"], "error")
         self.assertNotIn("ai_pattern_score", result)
 
-    def test_long_text_sampling_is_reported(self):
-        text = (EXAMPLES / "ai-garden.txt").read_text() * 10
-        with patch.object(ai, "MAX_PASSAGES", 2):
-            result = ai.analyze(text)
-        self.assertEqual(result["coverage"], "sampled")
-        self.assertEqual(result["passages_checked"], 2)
-        self.assertGreater(result["total_passages"], 2)
+    def test_real_long_text_checks_more_than_twelve_sections(self):
+        text = (EXAMPLES / "ai-garden.txt").read_text(encoding="utf-8") * 35
+        progress = []
+        result = ai.analyze(text, progress=progress.append)
+        self.assertEqual(result["status"], "estimated", result)
+        self.assertEqual(result["coverage"], "all eligible text")
+        self.assertGreater(result["passages_checked"], 12)
+        self.assertEqual(result["passages_checked"], result["total_passages"])
+        self.assertEqual(
+            result["passages"][-1]["end_character"], len(ai.clean_prose(text))
+        )
+        self.assertTrue(any("section" in message for message in progress))
 
     def test_word_pdf_and_text_use_same_detector(self):
         from docx import Document

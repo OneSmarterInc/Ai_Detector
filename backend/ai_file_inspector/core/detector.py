@@ -30,8 +30,8 @@ TOKENIZER_SHA = "9313554f1d10f9e6addc02ea82c727f7e646d9cfb153d2cb62560b9268dd4ca
 CONFIG_SHA = "ad6acc7701d399e359ea381088b20f8288bba5de78e8b9512f05f6d11c4f1214"
 CLS_TOKEN_ID, SEP_TOKEN_ID = 1, 2
 MIN_WORDS = 100
-MAX_CHARS = 200_000
-MAX_PASSAGES = 12
+# Bound tokenizer working memory, not the amount of document text checked.
+TOKENIZATION_BLOCK_CHARS = 20_000
 BODY_TOKENS = 480
 _lock = threading.Lock()
 _engine = None
@@ -123,23 +123,28 @@ def language(text):
 
 
 def choose_ranges(token_count):
-    """Balanced, nonoverlapping spans; sample evenly when documents are long."""
+    """Balanced, nonoverlapping spans covering every token, including the tail."""
+    if token_count <= 0:
+        return [], 0
     count = max(1, math.ceil(token_count / BODY_TOKENS))
     size = math.ceil(token_count / count)
     ranges = [
         (start, min(start + size, token_count)) for start in range(0, token_count, size)
     ]
-    indices = (
-        list(range(len(ranges)))
-        if len(ranges) <= MAX_PASSAGES
-        else sorted(
-            {
-                round(i * (len(ranges) - 1) / (MAX_PASSAGES - 1))
-                for i in range(MAX_PASSAGES)
-            }
-        )
-    )
-    return [(i, *ranges[i]) for i in indices], len(ranges)
+    return [(i, *span) for i, span in enumerate(ranges)], len(ranges)
+
+
+def text_blocks(text):
+    """Contiguous character ranges; split at spaces where possible, never omit text."""
+    start = 0
+    while start < len(text):
+        end = min(start + TOKENIZATION_BLOCK_CHARS, len(text))
+        if end < len(text):
+            boundary = text.rfind(" ", start, end)
+            if boundary > start:
+                end = boundary + 1
+        yield start, end
+        start = end
 
 
 def summarize(scores, weights):
@@ -170,7 +175,9 @@ def score_logit(logits):
     return exp_value / (1.0 + exp_value)
 
 
-def analyze(text, enabled=True):
+def analyze(text, enabled=True, progress=None):
+    progress = progress or (lambda message: None)
+    passages = []
     base = {
         "model": MODEL_NAME,
         "model_revision": MODEL_REVISION,
@@ -187,7 +194,8 @@ def analyze(text, enabled=True):
         return skip(
             "This looks like a data or code file. The AI writing check is for English prose."
         )
-    lines = [s for s in text[:MAX_CHARS].splitlines() if s.strip()]
+    progress("Preparing the complete extracted text")
+    lines = [s for s in text.splitlines() if s.strip()]
     code_lines = sum(
         bool(
             re.match(
@@ -201,7 +209,7 @@ def analyze(text, enabled=True):
         return skip(
             "Much of this file looks like code. This detector is intended for ordinary English paragraphs."
         )
-    cleaned = clean_prose(text[:MAX_CHARS])
+    cleaned = clean_prose(text)
     words = re.findall(r"\b[^\W\d_]+(?:['\u2019][^\W\d_]+)?\b", cleaned)
     base["words_in_checked_text"] = len(words)
     if len(words) < MIN_WORDS:
@@ -217,76 +225,87 @@ def analyze(text, enabled=True):
                     "The text was not confidently recognised as English. This model supports English prose only."
                 )
             started = time.monotonic()
+            progress("Loading the writing model")
             session, tokenizer = get_engine()
             import numpy as np
 
-            encoded = tokenizer.encode(cleaned, add_special_tokens=False)
-            ranges, total_passages = choose_ranges(len(encoded.ids))
+            blocks = list(text_blocks(cleaned))
             inputs_expected = {x.name for x in session.get_inputs()}
             if inputs_expected != {"input_ids", "attention_mask"}:
                 raise ValueError("Unexpected model inputs.")
-            passages, scores, weights = [], [], []
-            for index, start, end in ranges:
-                ids = np.array(
-                    [[CLS_TOKEN_ID] + encoded.ids[start:end] + [SEP_TOKEN_ID]],
-                    dtype=np.int64,
+            scores, weights = [], []
+            for block_number, (block_start, block_end) in enumerate(blocks, 1):
+                progress(f"Preparing text part {block_number} of {len(blocks)}")
+                encoded = tokenizer.encode(
+                    cleaned[block_start:block_end], add_special_tokens=False
                 )
-                logits = np.asarray(
-                    session.run(
-                        None, {"input_ids": ids, "attention_mask": np.ones_like(ids)}
-                    )[0],
-                    dtype=float,
-                )
-                score = score_logit(logits)
-                first, last = encoded.offsets[start][0], encoded.offsets[end - 1][1]
-                passages.append(
-                    {
-                        "passage_number": index + 1,
-                        "ai_pattern_score": round(score * 100, 1),
-                        "signal_band": "ai_like"
-                        if score >= 0.8
-                        else "human_like"
-                        if score <= 0.2
-                        else "uncertain",
-                        "text_excerpt": cleaned[first : min(last, first + 240)],
-                        "start_character": first + 1,
-                        "end_character": last,
-                        "tokens": end - start,
-                    }
-                )
-                scores.append(score)
-                weights.append(end - start)
+                ranges, section_count = choose_ranges(len(encoded.ids))
+                for index, start, end in ranges:
+                    progress(
+                        f"Checking text part {block_number} of {len(blocks)} - section {index + 1} of {section_count}"
+                    )
+                    ids = np.array(
+                        [[CLS_TOKEN_ID] + encoded.ids[start:end] + [SEP_TOKEN_ID]],
+                        dtype=np.int64,
+                    )
+                    logits = np.asarray(
+                        session.run(
+                            None,
+                            {"input_ids": ids, "attention_mask": np.ones_like(ids)},
+                        )[0],
+                        dtype=float,
+                    )
+                    score = score_logit(logits)
+                    first = block_start + encoded.offsets[start][0]
+                    last = block_start + encoded.offsets[end - 1][1]
+                    passages.append(
+                        {
+                            "passage_number": len(passages) + 1,
+                            "ai_pattern_score": round(score * 100, 1),
+                            "signal_band": "ai_like"
+                            if score >= 0.8
+                            else "human_like"
+                            if score <= 0.2
+                            else "uncertain",
+                            "text_excerpt": cleaned[first : min(last, first + 240)],
+                            "start_character": first + 1,
+                            "end_character": last,
+                            "tokens": end - start,
+                        }
+                    )
+                    scores.append(score)
+                    weights.append(end - start)
+            if not scores:
+                return skip("No readable model tokens were found.")
             average, label = summarize(scores, weights)
             notes = [
                 "Scores of 20 or lower lean human; 80 or higher lean AI. Middle scores or strongly disagreeing passages are uncertain. These are application rules, not validated accuracy guarantees."
             ]
-            if len(ranges) < total_passages:
-                notes.append(
-                    f"Checked {len(ranges)} passages spread through {total_passages} passages. The rest were not scored."
-                )
-            if len(text) > MAX_CHARS:
-                notes.append(
-                    f"Only the first {MAX_CHARS:,} characters were considered. The remaining text was not checked."
-                )
+            notes.append(
+                "Every section of the extracted eligible text was scored. Formatting and code removed during cleanup are not scored; unreadable content is reported separately."
+            )
             return {
                 **base,
                 "status": "estimated",
                 "label": label,
                 "ai_pattern_score": round(average * 100, 1),
-                "passages_checked": len(ranges),
-                "total_passages": total_passages,
+                "passages_checked": len(passages),
+                "total_passages": len(passages),
                 "passages": passages,
                 "notes": notes,
-                "coverage": "sampled"
-                if len(ranges) < total_passages or len(text) > MAX_CHARS
-                else "all eligible text",
+                "coverage": "all eligible text",
+                "characters_considered": len(text),
+                "characters_prepared": len(cleaned),
+                "tokens_checked": sum(weights),
                 "seconds": round(time.monotonic() - started, 2),
             }
     except Exception as exc:
         return {
             **skip(
-                "The AI writing check could not run. The other file checks can still finish.",
+                f"The AI writing check did not finish. {len(passages)} sections were checked before it stopped. No final writing estimate is shown; please retry this file.",
                 "error",
             ),
             "error": str(exc),
+            "coverage": "incomplete",
+            "passages_checked": len(passages),
         }

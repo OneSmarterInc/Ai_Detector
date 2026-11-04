@@ -14,19 +14,23 @@ Minimum: 100 words of English prose after formatting cleanup.
 There is no fixed minimum character count or page count. One page is enough
 if it supplies 100 eligible words. Other languages and code-heavy text are
 not scored by this model.
-Maximum considered: first 200,000 characters of extracted text, BEFORE cleanup.
-Maximum scored: 12 sections, up to 480 model tokens each (up to 5,760 body
-tokens). A token is a word or part of a word, not a character or a page.
-When there are more than 12 sections, the tool samples sections spread through
-the considered text. The rest is not scored. Reports disclose partial coverage.
-Therefore 200,000 characters does NOT mean every character is scored by AI.
-Hidden-character/file checks are separate and do not share this AI text cap.
+The complete extracted eligible text is checked, section by section.
+There is no document-character or section-count cutoff for uploaded files.
+Each model call handles up to 480 tokens. All sections are processed, including
+those at the end. Text is tokenized in small parts to limit working memory;
+this does not skip or sample document content. A token is a word or word part.
+Large files take longer. The portal shows page/section progress.
+If scoring fails, the file gets no final AI percentage; the report says the
+check did not finish and shows how many sections completed before the error.
+Formatting, code, unreadable text and non-English writing are not supported
+as AI prose estimates. Pasted text still has an explicit 200,000-character
+input limit; upload a text file for longer writing. Oversize files are
+rejected before inspection, not silently shortened.
 
 PDF (.pdf)
 - No minimum page count enforced. AI estimate still needs 100 eligible words.
-- Only the first 300 pages are inspected.
-- A file with more pages is not rejected for page count alone: it gets a
-  partial report. Split it into smaller PDFs to inspect the remaining pages.
+- Every page is attempted, with no page-count cutoff.
+- Pages that fail extraction or have no readable text are identified.
 - At most 50 embedded pictures are inspected across the document.
 - Text must be extractable. Image-only scans need OCR, which is not included.
 - PDFs needing a non-empty password must be unlocked first.
@@ -38,8 +42,9 @@ WORD (.docx)
   (200 MiB = 209,715,200 bytes). Larger expanded documents are rejected.
 - The same 100-word minimum and AI text limits above apply.
 - At most 50 embedded pictures are inspected.
-- Paragraphs, tables and headers/footers are read. Text boxes, footnotes,
-  tracked changes and some nested content may be missed.
+- Body paragraphs, nested tables, text boxes, headers/footers, footnotes
+  and endnotes are read. Deleted tracked text and reviewer comments are
+  excluded. Linked objects and words inside pictures need separate extraction.
 - Old .doc files are not supported; save them as .docx.
 
 PLAIN/FORMATTED PROSE (.txt, .md, .html)

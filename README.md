@@ -45,7 +45,7 @@ Original: https://huggingface.co/ShantanuT01/gradient-ai-text-detector
 
 Pinned ONNX conversion: https://huggingface.co/batmac/gradient-ai-text-detector-onnx/tree/776d0164ba0de631036c70f6a146d68a7cd4ea4e
 
-The report shows the length-weighted share of checked sections classified as AI-like, human-like or uncertain. A 60% AI-like share does not prove that AI wrote 60% of the words. Short/non-English content may have no estimate; long documents may be sampled. Image patterns do not identify AI-generated images. The detailed guide is in `backend/ai_file_inspector/resources/file-limits.txt` and inside the portal.
+The report shows the length-weighted share of checked sections classified as AI-like, human-like or uncertain. A 60% AI-like share does not prove that AI wrote 60% of the words. Short/non-English content may have no estimate; all sections of extracted eligible text are checked. Image patterns do not identify AI-generated images. The detailed guide is in `backend/ai_file_inspector/resources/file-limits.txt` and inside the portal.
 
 Weights are unchanged. Fine-tuning requires correctly labelled training data and independent testing. See [accuracy follow-up](docs/ACCURACY-FOLLOWUP.txt) and [model comparison](docs/MODEL-COMPARISON.txt) for previous results and limitations.
 

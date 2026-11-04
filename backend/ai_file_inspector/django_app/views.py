@@ -53,9 +53,11 @@ def info(request):
             max_batch_bytes=MAX_BATCH,
             max_files=10,
             minimum_words=100,
-            max_characters=200000,
-            max_sections=12,
-            pdf_pages=300,
+            max_paste_characters=200000,
+            full_document_scoring=True,
+            max_characters=None,
+            max_sections=None,
+            pdf_pages=None,
             image_pixels=40000000,
             limits_text=files("ai_file_inspector.resources")
             .joinpath("file-limits.txt")

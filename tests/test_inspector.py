@@ -186,14 +186,24 @@ class ScannerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Password"):
             self.scan(p)
 
-    def test_page_limit(self):
+    def test_pdf_reads_text_after_page_three_hundred(self):
         p = self.root / "long.pdf"
         writer = PdfWriter()
-        for _ in range(301):
+        for _ in range(300):
             writer.add_blank_page(width=20, height=20)
+        last = self.root / "last.pdf"
+        document = canvas.Canvas(str(last))
+        document.drawString(30, 500, "Final page sentinel content must be checked.")
+        document.save()
+        from pypdf import PdfReader
+
+        writer.add_page(PdfReader(str(last)).pages[0])
         writer.write(p)
         r = self.scan(p)
-        self.assertTrue(any("300" in x for x in r["issues"]))
+        self.assertEqual(r["pages_attempted"], 301)
+        self.assertEqual(r["pages_with_readable_text"], 1)
+        self.assertGreater(r["text"]["characters"], 30)
+        self.assertFalse(any("first 300" in x for x in r["issues"]))
 
     def test_file_size_limit(self):
         with patch.object(app, "MAX_BYTES", 2):

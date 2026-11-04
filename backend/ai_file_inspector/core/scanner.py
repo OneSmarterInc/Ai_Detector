@@ -12,6 +12,7 @@ import subprocess
 import unicodedata
 import zipfile
 from pathlib import Path
+from xml.etree import ElementTree
 
 TEXT = {".txt", ".md", ".csv", ".json", ".py", ".html", ".xml", ".tex", ".log"}
 IMAGES = {".png", ".jpg", ".jpeg", ".webp", ".tif", ".tiff", ".bmp"}
@@ -29,7 +30,7 @@ NOTICE = (
 )
 
 
-def text_scan(text, detect_ai=True):
+def text_scan(text, detect_ai=True, progress=None):
     hits, mixed, scripts = [], [], collections.Counter()
     hidden_count = mixed_count = 0
     for line_no, line in enumerate(text.split("\n"), 1):
@@ -112,7 +113,7 @@ def text_scan(text, detect_ai=True):
         )
     from .detector import analyze
 
-    ai_result = analyze(text, enabled=detect_ai)
+    ai_result = analyze(text, enabled=detect_ai, progress=progress)
     return {
         "characters": len(text),
         "unusual_character_count": hidden_count,
@@ -227,7 +228,37 @@ def credentials(path):
         return {"status": "Credential check could not finish", "error": str(exc)}
 
 
-def inspect_file(path, assets, counter):
+def word_xml_text(root):
+    """Read visible OOXML text in order, including nested tables and text boxes."""
+    word = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    drawing = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
+    compatibility = "{http://schemas.openxmlformats.org/markup-compatibility/2006}"
+    pieces = []
+
+    def visit(node):
+        if node.tag == word + "del":
+            return
+        if node.tag == compatibility + "AlternateContent":
+            choices = list(node)
+            if choices:
+                visit(choices[0])
+            return
+        if node.tag in (word + "t", drawing + "t"):
+            pieces.append(node.text or "")
+        elif node.tag in (word + "tab", word + "br", word + "cr"):
+            pieces.append(" ")
+        for child in node:
+            visit(child)
+        if node.tag == word + "p":
+            pieces.append("\n")
+
+    visit(root)
+    return "".join(pieces)
+
+
+def inspect_file(path, assets, counter, progress=None):
+    progress = progress or (lambda message: None)
+    progress("Reading the file")
     result = {
         "file": str(path.resolve()),
         "type": path.suffix.lower(),
@@ -270,7 +301,9 @@ def inspect_file(path, assets, counter):
                     "Some text could not be read correctly. Save a copy as UTF-8 text and check it again."
                 )
         result["text"] = text_scan(
-            text, detect_ai=ext not in {".py", ".json", ".xml", ".csv", ".tex", ".log"}
+            text,
+            detect_ai=ext not in {".py", ".json", ".xml", ".csv", ".tex", ".log"},
+            progress=progress,
         )
     elif ext in IMAGES:
         add_image(path.read_bytes(), path.name)
@@ -298,18 +331,24 @@ def inspect_file(path, assets, counter):
                 "comments",
             )
         }
-        chunks = [p.text for p in doc.paragraphs]
-        for table in doc.tables:
-            for row in table.rows:
-                chunks.extend(cell.text for cell in row.cells)
-        seen_parts = set()
-        for section in doc.sections:
-            for part in (section.header, section.footer):
-                if str(part.part.partname) in seen_parts:
-                    continue
-                seen_parts.add(str(part.part.partname))
-                chunks.extend(p.text for p in part.paragraphs)
+        chunks = [word_xml_text(doc.element)]
         with zipfile.ZipFile(path) as archive:
+            for part_name in archive.namelist():
+                if re.fullmatch(
+                    r"word/(?:header[^/]*|footer[^/]*|footnotes|endnotes)\.xml",
+                    part_name,
+                ):
+                    progress(f"Reading Word text: {part_name}")
+                    try:
+                        chunks.append(
+                            word_xml_text(
+                                ElementTree.fromstring(archive.read(part_name))
+                            )
+                        )
+                    except Exception as exc:
+                        result["issues"].append(
+                            f"Text in {part_name} could not be read: {exc}"
+                        )
             if "docProps/app.xml" in archive.namelist():
                 result["metadata"]["application_properties"] = archive.read(
                     "docProps/app.xml"
@@ -325,9 +364,9 @@ def inspect_file(path, assets, counter):
                         )
                         break
                     add_image(archive.read(name), name)
-        result["text"] = text_scan("\n".join(chunks))
+        result["text"] = text_scan("\n".join(chunks), progress=progress)
         result["warnings"].append(
-            "Text boxes, tracked changes, footnotes, and some nested content may not be extracted. Line numbers refer to extracted text."
+            "Body text, nested tables, text boxes, stored headers/footers, footnotes and endnotes are included. Deleted tracked text, comments, linked objects and words inside pictures are not scored. Line numbers refer to extracted text."
         )
     elif ext == ".pdf":
         from pypdf import PdfReader
@@ -340,16 +379,21 @@ def inspect_file(path, assets, counter):
         }
         result["page_count"] = len(reader.pages)
         chunks = []
+        result["pages_attempted"] = 0
+        result["pages_with_readable_text"] = 0
         for idx, page in enumerate(reader.pages):
-            if idx >= 300:
-                result["issues"].append(
-                    "Only the first 300 pages were inspected. Split this PDF into smaller files to check the remaining pages."
-                )
-                break
+            progress(f"Reading PDF page {idx + 1} of {len(reader.pages)}")
+            result["pages_attempted"] = idx + 1
             page_text = None
             try:
                 page_text = page.extract_text() or ""
                 chunks.append(page_text)
+                if page_text.strip():
+                    result["pages_with_readable_text"] += 1
+                else:
+                    result["issues"].append(
+                        f"Page {idx + 1} has no readable text. If it contains writing, text recognition (OCR) is needed; that writing was not checked."
+                    )
             except Exception as exc:
                 result["issues"].append(
                     f"Text on page {idx + 1} could not be read: {exc}"
@@ -357,10 +401,6 @@ def inspect_file(path, assets, counter):
             try:
                 if len(result["images"]) < 50:
                     for embedded in page.images:
-                        if page_text is not None and not page_text.strip():
-                            result["issues"].append(
-                                f"Page {idx + 1} has a picture but no readable text. Any words inside it were not checked; use text recognition (OCR) if needed."
-                            )
                         add_image(embedded.data, f"Page {idx + 1}: {embedded.name}")
                         if len(result["images"]) >= 50:
                             result["warnings"].append(
@@ -372,7 +412,7 @@ def inspect_file(path, assets, counter):
                     f"Some pictures on page {idx + 1} could not be read: {exc}"
                 )
         text = "\n".join(chunks)
-        result["text"] = text_scan(text)
+        result["text"] = text_scan(text, progress=progress)
         result["warnings"].append(
             "PDF extraction can change or omit characters. Positions refer to extracted text. Image-only pages require OCR, which is not included."
         )
@@ -392,7 +432,7 @@ def inspect_file(path, assets, counter):
     ai_result = result.get("text", {}).get("ai_detection", {})
     if ai_result.get("status") == "error":
         result["issues"].append(
-            "The trained AI writing detector could not run. See its message above; other checks are separate."
+            "The writing check did not finish. No final AI percentage is shown for this file. See the message above and retry it."
         )
     if ai_result.get("coverage") == "sampled":
         result["issues"].append(
