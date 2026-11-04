@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+vendor/
+reports/
+backups/
+text-model/
+*.onnx
+gradient-model/tokenizer.json
+*.part
+*.zip
+.env
+.env.*
+!.env.example

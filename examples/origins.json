@@ -1,0 +1,31 @@
+[
+  {
+    "file": "ai-garden.txt",
+    "origin": "AI",
+    "source": "Written by the assistant in this chat; original user test sample."
+  },
+  {
+    "file": "ai-backups.txt",
+    "origin": "AI",
+    "source": "Written by the assistant for this test, 3 November 2026."
+  },
+  {
+    "file": "ai-bus-story.txt",
+    "origin": "AI",
+    "source": "Written by the assistant for this test, 3 November 2026."
+  },
+  {
+    "file": "human-austen.txt",
+    "origin": "human",
+    "source": "https://www.gutenberg.org/cache/epub/1342/pg1342.txt",
+    "author": "Jane Austen, Pride and Prejudice (1813)",
+    "selection": "First 260 whitespace-delimited words beginning at the named opening passage; not selected using detector scores."
+  },
+  {
+    "file": "human-thoreau.txt",
+    "origin": "human",
+    "source": "https://www.gutenberg.org/cache/epub/205/pg205.txt",
+    "author": "Henry David Thoreau, Walden (1854)",
+    "selection": "First 260 whitespace-delimited words beginning at the named opening passage; not selected using detector scores."
+  }
+]

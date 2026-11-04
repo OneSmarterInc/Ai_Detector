@@ -1,0 +1,174 @@
+{
+  "scope": "Five known-origin smoke-test passages. Not a representative, independent or calibrated accuracy benchmark. Historical human passages may overlap training data. No thresholds were tuned to these examples.",
+  "results": [
+    {
+      "file": "ai-garden.txt",
+      "origin": "AI",
+      "source": "Written by the assistant in this chat; original user test sample.",
+      "result": {
+        "model": "AIGC-Detector English v3 (INT8)",
+        "minimum_words": 100,
+        "meaning": "This is a trained-model estimate, not proof. The score is not a percentage of AI-written words or a calibrated probability.",
+        "scope": "English prose only; short text, code, other languages and heavily edited writing are not reliably supported.",
+        "words_in_checked_text": 160,
+        "detected_language": "en",
+        "status": "estimated",
+        "label": "Uncertain",
+        "ai_pattern_score": 44.7,
+        "passages_checked": 1,
+        "total_passages": 1,
+        "passages": [
+          {
+            "passage_number": 1,
+            "ai_pattern_score": 44.7,
+            "text_excerpt": "A Small Garden at Home You do not need a large yard to enjoy gardening. A few pots near a sunny window can be enough to begin. Choose a plant that suits the space you have, and spend a little time learning how to care for it. Start small. O",
+            "start_character": 1,
+            "end_character": 864,
+            "tokens": 182
+          }
+        ],
+        "notes": [
+          "Scores of 20 or lower lean human; 80 or higher lean AI. Middle scores or strongly disagreeing passages are uncertain. These are application rules, not validated accuracy guarantees."
+        ],
+        "coverage": "all eligible text",
+        "seconds": 2.81
+      }
+    },
+    {
+      "file": "ai-backups.txt",
+      "origin": "AI",
+      "source": "Written by the assistant for this test, 3 November 2026.",
+      "result": {
+        "model": "AIGC-Detector English v3 (INT8)",
+        "minimum_words": 100,
+        "meaning": "This is a trained-model estimate, not proof. The score is not a percentage of AI-written words or a calibrated probability.",
+        "scope": "English prose only; short text, code, other languages and heavily edited writing are not reliably supported.",
+        "words_in_checked_text": 187,
+        "detected_language": "en",
+        "status": "estimated",
+        "label": "Leans AI-generated",
+        "ai_pattern_score": 100.0,
+        "passages_checked": 1,
+        "total_passages": 1,
+        "passages": [
+          {
+            "passage_number": 1,
+            "ai_pattern_score": 100.0,
+            "text_excerpt": "Why a Simple Backup Routine Matters A useful backup system should be easy enough to maintain on a busy day. Keeping a second copy of important files can reduce the disruption caused by an accidental deletion or a failed device. The best rou",
+            "start_character": 1,
+            "end_character": 1119,
+            "tokens": 207
+          }
+        ],
+        "notes": [
+          "Scores of 20 or lower lean human; 80 or higher lean AI. Middle scores or strongly disagreeing passages are uncertain. These are application rules, not validated accuracy guarantees."
+        ],
+        "coverage": "all eligible text",
+        "seconds": 0.23
+      }
+    },
+    {
+      "file": "ai-bus-story.txt",
+      "origin": "AI",
+      "source": "Written by the assistant for this test, 3 November 2026.",
+      "result": {
+        "model": "AIGC-Detector English v3 (INT8)",
+        "minimum_words": 100,
+        "meaning": "This is a trained-model estimate, not proof. The score is not a percentage of AI-written words or a calibrated probability.",
+        "scope": "English prose only; short text, code, other languages and heavily edited writing are not reliably supported.",
+        "words_in_checked_text": 175,
+        "detected_language": "en",
+        "status": "estimated",
+        "label": "Leans AI-generated",
+        "ai_pattern_score": 99.9,
+        "passages_checked": 1,
+        "total_passages": 1,
+        "passages": [
+          {
+            "passage_number": 1,
+            "ai_pattern_score": 99.9,
+            "text_excerpt": "I reached the bus stop with one shoelace undone and a paper bag slowly tearing at the bottom. Inside were three bread rolls and a jar of jam. The jar was winning. An older woman on the bench watched me shift the bag from one arm to the othe",
+            "start_character": 1,
+            "end_character": 885,
+            "tokens": 199
+          }
+        ],
+        "notes": [
+          "Scores of 20 or lower lean human; 80 or higher lean AI. Middle scores or strongly disagreeing passages are uncertain. These are application rules, not validated accuracy guarantees."
+        ],
+        "coverage": "all eligible text",
+        "seconds": 0.23
+      }
+    },
+    {
+      "file": "human-austen.txt",
+      "origin": "human",
+      "source": "https://www.gutenberg.org/cache/epub/1342/pg1342.txt",
+      "author": "Jane Austen, Pride and Prejudice (1813)",
+      "selection": "First 260 whitespace-delimited words beginning at the named opening passage; not selected using detector scores.",
+      "result": {
+        "model": "AIGC-Detector English v3 (INT8)",
+        "minimum_words": 100,
+        "meaning": "This is a trained-model estimate, not proof. The score is not a percentage of AI-written words or a calibrated probability.",
+        "scope": "English prose only; short text, code, other languages and heavily edited writing are not reliably supported.",
+        "words_in_checked_text": 259,
+        "detected_language": "en",
+        "status": "estimated",
+        "label": "Leans human-written",
+        "ai_pattern_score": 3.5,
+        "passages_checked": 1,
+        "total_passages": 1,
+        "passages": [
+          {
+            "passage_number": 1,
+            "ai_pattern_score": 3.5,
+            "text_excerpt": "It is a truth universally acknowledged, that a single man in possession of a good fortune must be in want of a wife. However little known the feelings or views of such a man may be on his first entering a neighbourhood, this truth is so wel",
+            "start_character": 1,
+            "end_character": 1363,
+            "tokens": 363
+          }
+        ],
+        "notes": [
+          "Scores of 20 or lower lean human; 80 or higher lean AI. Middle scores or strongly disagreeing passages are uncertain. These are application rules, not validated accuracy guarantees."
+        ],
+        "coverage": "all eligible text",
+        "seconds": 0.42
+      }
+    },
+    {
+      "file": "human-thoreau.txt",
+      "origin": "human",
+      "source": "https://www.gutenberg.org/cache/epub/205/pg205.txt",
+      "author": "Henry David Thoreau, Walden (1854)",
+      "selection": "First 260 whitespace-delimited words beginning at the named opening passage; not selected using detector scores.",
+      "result": {
+        "model": "AIGC-Detector English v3 (INT8)",
+        "minimum_words": 100,
+        "meaning": "This is a trained-model estimate, not proof. The score is not a percentage of AI-written words or a calibrated probability.",
+        "scope": "English prose only; short text, code, other languages and heavily edited writing are not reliably supported.",
+        "words_in_checked_text": 260,
+        "detected_language": "en",
+        "status": "estimated",
+        "label": "Leans human-written",
+        "ai_pattern_score": 1.5,
+        "passages_checked": 1,
+        "total_passages": 1,
+        "passages": [
+          {
+            "passage_number": 1,
+            "ai_pattern_score": 1.5,
+            "text_excerpt": "When I wrote the following pages, or rather the bulk of them, I lived alone, in the woods, a mile from any neighbor, in a house which I had built myself, on the shore of Walden Pond, in Concord, Massachusetts, and earned my living by the la",
+            "start_character": 1,
+            "end_character": 1386,
+            "tokens": 313
+          }
+        ],
+        "notes": [
+          "Scores of 20 or lower lean human; 80 or higher lean AI. Middle scores or strongly disagreeing passages are uncertain. These are application rules, not validated accuracy guarantees."
+        ],
+        "coverage": "all eligible text",
+        "seconds": 0.38
+      }
+    }
+  ]
+}

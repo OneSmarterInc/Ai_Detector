@@ -1,0 +1,821 @@
+{
+  "model": "AIGC-Detector English v3 (INT8)",
+  "model_sha256": "78b9d3a23649965738698d546ffc65abc5cb7f2be08a52b1c227e52b7e220d88",
+  "detector_sha256": "8fbb6334f491025bc986937079410ce27d0e6a0418750c492ccdc26f5acd2a1d",
+  "dataset_sha256": "45de264c1f51f9fbcc1d7e82328184df424de15a46b78a8a83f536549398bf29",
+  "limitation": "Reference check only. Training overlap, sample selection and sample size affect results. Do not claim general accuracy from this report. Uncertain and skipped results are not correct answers.",
+  "overall": {
+    "total": 80,
+    "human_examples": 40,
+    "ai_examples": 40,
+    "correct": 64,
+    "human_flagged_ai": 4,
+    "ai_called_human": 5,
+    "uncertain": 7,
+    "not_checked": 0,
+    "errors": 0,
+    "human_false_alarm_percent": 10.0,
+    "ai_called_human_percent": 12.5,
+    "clear_answer_percent": 91.2,
+    "correct_among_clear_answers_percent": 87.7
+  },
+  "by_domain": {
+    "finance": {
+      "total": 16,
+      "human_examples": 8,
+      "ai_examples": 8,
+      "correct": 11,
+      "human_flagged_ai": 1,
+      "ai_called_human": 1,
+      "uncertain": 3,
+      "not_checked": 0,
+      "errors": 0,
+      "human_false_alarm_percent": 12.5,
+      "ai_called_human_percent": 12.5,
+      "clear_answer_percent": 81.2,
+      "correct_among_clear_answers_percent": 84.6
+    },
+    "medicine": {
+      "total": 16,
+      "human_examples": 8,
+      "ai_examples": 8,
+      "correct": 16,
+      "human_flagged_ai": 0,
+      "ai_called_human": 0,
+      "uncertain": 0,
+      "not_checked": 0,
+      "errors": 0,
+      "human_false_alarm_percent": 0.0,
+      "ai_called_human_percent": 0.0,
+      "clear_answer_percent": 100.0,
+      "correct_among_clear_answers_percent": 100.0
+    },
+    "open_qa": {
+      "total": 16,
+      "human_examples": 8,
+      "ai_examples": 8,
+      "correct": 16,
+      "human_flagged_ai": 0,
+      "ai_called_human": 0,
+      "uncertain": 0,
+      "not_checked": 0,
+      "errors": 0,
+      "human_false_alarm_percent": 0.0,
+      "ai_called_human_percent": 0.0,
+      "clear_answer_percent": 100.0,
+      "correct_among_clear_answers_percent": 100.0
+    },
+    "reddit_eli5": {
+      "total": 16,
+      "human_examples": 8,
+      "ai_examples": 8,
+      "correct": 13,
+      "human_flagged_ai": 0,
+      "ai_called_human": 2,
+      "uncertain": 1,
+      "not_checked": 0,
+      "errors": 0,
+      "human_false_alarm_percent": 0.0,
+      "ai_called_human_percent": 25.0,
+      "clear_answer_percent": 93.8,
+      "correct_among_clear_answers_percent": 86.7
+    },
+    "wiki_csai": {
+      "total": 16,
+      "human_examples": 8,
+      "ai_examples": 8,
+      "correct": 8,
+      "human_flagged_ai": 3,
+      "ai_called_human": 2,
+      "uncertain": 3,
+      "not_checked": 0,
+      "errors": 0,
+      "human_false_alarm_percent": 37.5,
+      "ai_called_human_percent": 25.0,
+      "clear_answer_percent": 81.2,
+      "correct_among_clear_answers_percent": 61.5
+    }
+  },
+  "rows": [
+    {
+      "id": "finance-1-human",
+      "domain": "finance",
+      "expected": "human",
+      "prediction": "uncertain",
+      "outcome": "uncertain",
+      "score": 20.2,
+      "reason": null
+    },
+    {
+      "id": "finance-1-ai",
+      "domain": "finance",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "finance-3-human",
+      "domain": "finance",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "finance-3-ai",
+      "domain": "finance",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 98.1,
+      "reason": null
+    },
+    {
+      "id": "finance-5-human",
+      "domain": "finance",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.4,
+      "reason": null
+    },
+    {
+      "id": "finance-5-ai",
+      "domain": "finance",
+      "expected": "ai",
+      "prediction": "uncertain",
+      "outcome": "uncertain",
+      "score": 59.9,
+      "reason": null
+    },
+    {
+      "id": "finance-6-human",
+      "domain": "finance",
+      "expected": "human",
+      "prediction": "uncertain",
+      "outcome": "uncertain",
+      "score": 40.1,
+      "reason": null
+    },
+    {
+      "id": "finance-6-ai",
+      "domain": "finance",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "finance-8-human",
+      "domain": "finance",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "finance-8-ai",
+      "domain": "finance",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "finance-11-human",
+      "domain": "finance",
+      "expected": "human",
+      "prediction": "ai",
+      "outcome": "human_flagged_ai",
+      "score": 97.3,
+      "reason": null
+    },
+    {
+      "id": "finance-11-ai",
+      "domain": "finance",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "finance-12-human",
+      "domain": "finance",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "finance-12-ai",
+      "domain": "finance",
+      "expected": "ai",
+      "prediction": "human",
+      "outcome": "ai_called_human",
+      "score": 4.6,
+      "reason": null
+    },
+    {
+      "id": "finance-13-human",
+      "domain": "finance",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "finance-13-ai",
+      "domain": "finance",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "medicine-4-human",
+      "domain": "medicine",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 1.0,
+      "reason": null
+    },
+    {
+      "id": "medicine-4-ai",
+      "domain": "medicine",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "medicine-7-human",
+      "domain": "medicine",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.3,
+      "reason": null
+    },
+    {
+      "id": "medicine-7-ai",
+      "domain": "medicine",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "medicine-9-human",
+      "domain": "medicine",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "medicine-9-ai",
+      "domain": "medicine",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.8,
+      "reason": null
+    },
+    {
+      "id": "medicine-14-human",
+      "domain": "medicine",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 6.2,
+      "reason": null
+    },
+    {
+      "id": "medicine-14-ai",
+      "domain": "medicine",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "medicine-15-human",
+      "domain": "medicine",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.8,
+      "reason": null
+    },
+    {
+      "id": "medicine-15-ai",
+      "domain": "medicine",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "medicine-18-human",
+      "domain": "medicine",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "medicine-18-ai",
+      "domain": "medicine",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.6,
+      "reason": null
+    },
+    {
+      "id": "medicine-20-human",
+      "domain": "medicine",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "medicine-20-ai",
+      "domain": "medicine",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 98.0,
+      "reason": null
+    },
+    {
+      "id": "medicine-26-human",
+      "domain": "medicine",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 1.0,
+      "reason": null
+    },
+    {
+      "id": "medicine-26-ai",
+      "domain": "medicine",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "open_qa-0-human",
+      "domain": "open_qa",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "open_qa-0-ai",
+      "domain": "open_qa",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "open_qa-1-human",
+      "domain": "open_qa",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "open_qa-1-ai",
+      "domain": "open_qa",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "open_qa-2-human",
+      "domain": "open_qa",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 6.6,
+      "reason": null
+    },
+    {
+      "id": "open_qa-2-ai",
+      "domain": "open_qa",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.8,
+      "reason": null
+    },
+    {
+      "id": "open_qa-3-human",
+      "domain": "open_qa",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 11.8,
+      "reason": null
+    },
+    {
+      "id": "open_qa-3-ai",
+      "domain": "open_qa",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "open_qa-4-human",
+      "domain": "open_qa",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.2,
+      "reason": null
+    },
+    {
+      "id": "open_qa-4-ai",
+      "domain": "open_qa",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "open_qa-9-human",
+      "domain": "open_qa",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 1.1,
+      "reason": null
+    },
+    {
+      "id": "open_qa-9-ai",
+      "domain": "open_qa",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "open_qa-10-human",
+      "domain": "open_qa",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "open_qa-10-ai",
+      "domain": "open_qa",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.6,
+      "reason": null
+    },
+    {
+      "id": "open_qa-13-human",
+      "domain": "open_qa",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 12.1,
+      "reason": null
+    },
+    {
+      "id": "open_qa-13-ai",
+      "domain": "open_qa",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.8,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-0-human",
+      "domain": "reddit_eli5",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-0-ai",
+      "domain": "reddit_eli5",
+      "expected": "ai",
+      "prediction": "human",
+      "outcome": "ai_called_human",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-2-human",
+      "domain": "reddit_eli5",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-2-ai",
+      "domain": "reddit_eli5",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 81.7,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-3-human",
+      "domain": "reddit_eli5",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-3-ai",
+      "domain": "reddit_eli5",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-7-human",
+      "domain": "reddit_eli5",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-7-ai",
+      "domain": "reddit_eli5",
+      "expected": "ai",
+      "prediction": "uncertain",
+      "outcome": "uncertain",
+      "score": 57.0,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-8-human",
+      "domain": "reddit_eli5",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-8-ai",
+      "domain": "reddit_eli5",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 97.9,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-9-human",
+      "domain": "reddit_eli5",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-9-ai",
+      "domain": "reddit_eli5",
+      "expected": "ai",
+      "prediction": "human",
+      "outcome": "ai_called_human",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-11-human",
+      "domain": "reddit_eli5",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-11-ai",
+      "domain": "reddit_eli5",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-12-human",
+      "domain": "reddit_eli5",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.1,
+      "reason": null
+    },
+    {
+      "id": "reddit_eli5-12-ai",
+      "domain": "reddit_eli5",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-0-human",
+      "domain": "wiki_csai",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 11.9,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-0-ai",
+      "domain": "wiki_csai",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-2-human",
+      "domain": "wiki_csai",
+      "expected": "human",
+      "prediction": "ai",
+      "outcome": "human_flagged_ai",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-2-ai",
+      "domain": "wiki_csai",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-3-human",
+      "domain": "wiki_csai",
+      "expected": "human",
+      "prediction": "ai",
+      "outcome": "human_flagged_ai",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-3-ai",
+      "domain": "wiki_csai",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.0,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-5-human",
+      "domain": "wiki_csai",
+      "expected": "human",
+      "prediction": "uncertain",
+      "outcome": "uncertain",
+      "score": 60.3,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-5-ai",
+      "domain": "wiki_csai",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 98.8,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-6-human",
+      "domain": "wiki_csai",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.4,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-6-ai",
+      "domain": "wiki_csai",
+      "expected": "ai",
+      "prediction": "ai",
+      "outcome": "correct",
+      "score": 99.9,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-7-human",
+      "domain": "wiki_csai",
+      "expected": "human",
+      "prediction": "ai",
+      "outcome": "human_flagged_ai",
+      "score": 100.0,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-7-ai",
+      "domain": "wiki_csai",
+      "expected": "ai",
+      "prediction": "human",
+      "outcome": "ai_called_human",
+      "score": 1.4,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-8-human",
+      "domain": "wiki_csai",
+      "expected": "human",
+      "prediction": "uncertain",
+      "outcome": "uncertain",
+      "score": 47.5,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-8-ai",
+      "domain": "wiki_csai",
+      "expected": "ai",
+      "prediction": "uncertain",
+      "outcome": "uncertain",
+      "score": 77.6,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-10-human",
+      "domain": "wiki_csai",
+      "expected": "human",
+      "prediction": "human",
+      "outcome": "correct",
+      "score": 0.2,
+      "reason": null
+    },
+    {
+      "id": "wiki_csai-10-ai",
+      "domain": "wiki_csai",
+      "expected": "ai",
+      "prediction": "human",
+      "outcome": "ai_called_human",
+      "score": 2.9,
+      "reason": null
+    }
+  ]
+}
